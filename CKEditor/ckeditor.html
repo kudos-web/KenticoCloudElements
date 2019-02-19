@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CKEditor</title>
+    <!-- libs -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/1.0.0-alpha.2/classic/ckeditor.js"></script>
+
+    <!-- Kentico Custom elements API-->
+    <script src="https://app.kenticocloud.com/js-api/custom-element.js"></script>
+
+    <!-- Custom elements styles -->
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom element HTML -->
+    <textarea id="editor"></textarea>
+
+    <!-- Custom element code -->
+    <script>
+        var editor = null;
+        ClassicEditor.create(document.querySelector("#editor"), {
+        toolbar: [
+            "headings",
+            "bold",
+            "italic",
+            "link",
+            "bulletedList",
+            "numberedList",
+            "blockQuote",
+            "insertimage",
+            "undo",
+            "redo"
+        ]
+        })
+        .then(editor => {
+            //debugger;
+            window.editor = editor;
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    </script>
+</body>
+</html>
