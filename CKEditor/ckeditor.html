@@ -5,7 +5,7 @@
     <title>CKEditor</title>
     <!-- libs -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
-    <script src="https://cdn.ckeditor.com/ckeditor5/1.0.0-alpha.2/classic/ckeditor.js"></script>
+    <script src="ckeditor/ckeditor.js"></script>
 
     <!-- Kentico Custom elements API-->
     <script src="https://app.kenticocloud.com/js-api/custom-element.js"></script>
@@ -17,11 +17,16 @@
             padding: 0;
             overflow: hidden;
         }
+        .cke_reset {
+            min-height: 400px;
+        }
     </style>
 </head>
 <body>
     <!-- Custom element HTML -->
-    <textarea id="editor"></textarea>
+    <textarea name="editor" id="editor" rows="10" cols="80">
+        This is my textarea to be replaced with CKEditor.
+    </textarea>
 
     <!-- Custom element code -->
     <script>
@@ -42,38 +47,19 @@
 
         function initializeEditor(initialValue, isDisabled) {
 
-            var editor = null;
+            var editorInstance = CKEDITOR.replace( 'editor' );
 
-            ClassicEditor.create(document.querySelector("#editor"), {
-            toolbar: [
-                "headings",
-                "bold",
-                "italic",
-                "link",
-                "bulletedList",
-                "numberedList",
-                "blockQuote",
-                "undo",
-                "redo"
-            ]
-            })
-            .then(editor => {
-                //debugger;
-                window.editorInstance = editor;
-                editor.isReadOnly = isDisabled;
-                editor.setData(initialValue || '');
+            editorInstance.setData(initialValue || '');
 
-                editor.document.on( 'change:data', (evt, data) => {
-                    console.log( 'The data has changed!' );
-                });
+            editorInstance.config.readOnly = isDisabled;
 
-            })
-            .catch(error => {
-                console.error(error);
+            editorInstance.on( 'change', function( evt ) {
+                setValue(evt.editor.getData());
             });
 
             // React on window resize to adjust the height
             window.addEventListener('resize', updateSize);
+
         };
 
         function updateSize() {
