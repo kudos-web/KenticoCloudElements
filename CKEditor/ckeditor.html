@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>CKEditor</title>
     <!-- libs -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
     <script src="https://cdn.ckeditor.com/ckeditor5/1.0.0-alpha.2/classic/ckeditor.js"></script>
 
     <!-- Kentico Custom elements API-->
@@ -24,28 +25,86 @@
 
     <!-- Custom element code -->
     <script>
-        var editor = null;
-        ClassicEditor.create(document.querySelector("#editor"), {
-        toolbar: [
-            "headings",
-            "bold",
-            "italic",
-            "link",
-            "bulletedList",
-            "numberedList",
-            "blockQuote",
-            "insertimage",
-            "undo",
-            "redo"
-        ]
-        })
-        .then(editor => {
-            //debugger;
-            window.editor = editor;
-        })
-        .catch(error => {
-            console.error(error);
-        });
+        var isDisabled = false;
+        var editorInstance = null;
+
+        function updateDisabled(disabled) {
+
+            if (editorInstance) {
+
+                editorInstance.isReadOnly = disabled;
+
+                updateSize();
+            }
+
+            isDisabled = disabled;
+        }
+
+        function initializeEditor(initialValue, isDisabled) {
+
+            var editor = null;
+
+            ClassicEditor.create(document.querySelector("#editor"), {
+            toolbar: [
+                "headings",
+                "bold",
+                "italic",
+                "link",
+                "bulletedList",
+                "numberedList",
+                "blockQuote",
+                "undo",
+                "redo"
+            ]
+            })
+            .then(editor => {
+                //debugger;
+                window.editorInstance = editor;
+                editor.isReadOnly = isDisabled;
+                editor.setData(initialValue || '');
+
+                editor.document.on( 'change:data', (evt, data) => {
+                    console.log( 'The data has changed!' );
+                });
+
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
+            // React on window resize to adjust the height
+            window.addEventListener('resize', updateSize);
+        };
+
+        function updateSize() {
+            // Update the custom element height in the Kentico UI.
+            const height = Math.ceil($("html").height());
+            CustomElement.setHeight(height);
+        }
+
+        function setValue(value) {
+            // Send updated value to Kentico (send null in case of the empty string => element will not meet required condition).
+            if (!isDisabled) {
+                CustomElement.setValue(value || null);
+            }
+        }
+
+        function initCustomElement() {
+            try {
+                CustomElement.init((element, _context) => {
+                    // Setup with initial value and disabled state
+                    initializeEditor(element.value, element.disabled);
+                    updateSize();
+                });
+                // React on disabled changed (e.g. when publishing the item)
+                CustomElement.onDisabledChanged(updateDisabled);
+            } catch (err) {
+                // Initialization with Kentico Custom element API failed (page displayed outside of the Kentico UI)
+                console.error(err);
+                initializeEditor(err.toString());
+            }
+        }
+        initCustomElement();
     </script>
 </body>
 </html>
