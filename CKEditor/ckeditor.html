@@ -57,7 +57,9 @@
                 setValue(evt.editor.getData());
             });
 
-            updateSize();
+            editorInstance.on("instanceReady", function(event) {
+                updateSize();
+            });
 
             // React on window resize to adjust the height
             window.addEventListener('resize', updateSize);
@@ -67,7 +69,7 @@
         function updateSize() {
             // Update the custom element height in the Kentico UI.
             const height = Math.ceil($("html").height());
-            console.log(height);
+           
             CustomElement.setHeight(height);
         }
 
@@ -92,7 +94,9 @@
                 initializeEditor(err.toString());
             }
         }
+
         initCustomElement();
+
     </script>
 </body>
 </html>
