@@ -57,6 +57,8 @@
                 setValue(evt.editor.getData());
             });
 
+            updateSize();
+
             // React on window resize to adjust the height
             window.addEventListener('resize', updateSize);
 
@@ -65,6 +67,7 @@
         function updateSize() {
             // Update the custom element height in the Kentico UI.
             const height = Math.ceil($("html").height());
+            console.log(height);
             CustomElement.setHeight(height);
         }
 
@@ -79,8 +82,7 @@
             try {
                 CustomElement.init((element, _context) => {
                     // Setup with initial value and disabled state
-                    initializeEditor(element.value, element.disabled);
-                    updateSize();
+                    initializeEditor(element.value, element.disabled);                   
                 });
                 // React on disabled changed (e.g. when publishing the item)
                 CustomElement.onDisabledChanged(updateDisabled);
